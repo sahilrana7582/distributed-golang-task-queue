@@ -21,6 +21,11 @@ func NewRedisQueue(addr string) *RedisQueue {
 	client := redis.NewClient(&redis.Options{
 		Addr: addr,
 	})
+
+	if _, err := client.Ping(context.Background()).Result(); err != nil {
+		panic("failed to connect to Redis: " + err.Error())
+	}
+
 	return &RedisQueue{
 		redisClient: client,
 		ctx:         context.Background(),
@@ -52,10 +57,12 @@ func (rq *RedisQueue) Dequeue(timeout time.Duration) (*models.Task, error) {
 	if err := json.Unmarshal([]byte(result[1]), &task); err != nil {
 		return nil, err
 	}
-	task.Status = models.StatusInProgress
+
 	if err := rq.redisClient.LRem(rq.ctx, RedisTaskQueueKey, 0, result[1]).Err(); err != nil {
 		return nil, err
 	}
+
+	task.Status = models.StatusInProgress
 
 	return &task, nil
 }
@@ -70,4 +77,11 @@ func (rq *RedisQueue) Ping() (string, error) {
 		return "", err
 	}
 	return status, nil
+}
+
+func (rq *RedisQueue) Close() error {
+	if rq.redisClient != nil {
+		return rq.redisClient.Close()
+	}
+	return nil
 }

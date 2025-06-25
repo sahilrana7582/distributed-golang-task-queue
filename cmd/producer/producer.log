@@ -1,0 +1,10 @@
+Producer: 2025/06/25 22:19:16 producer.go:28: ====================     2025-06-25 22:19:16    =======================
+Producer: 2025/06/25 22:19:16 producer.go:50: ✅ Enqueued task: ID=task-20250625221916 | Type=image_resize | Payload="eyJpbWFnZV91cmwiOiJodHRwOi8vaW1nLmNvbS8xLmpwZyIsIndpZHRoIjo4MDAsImhlaWdodCI6NjAwfQ=="
+Producer: 2025/06/25 22:19:21 producer.go:50: ✅ Enqueued task: ID=task-20250625221921 | Type=data_backup | Payload="eyJyZXNvdXJjZV9pZCI6InJlczAxIiwiYmFja3VwX3R5cGUiOiJmdWxsIiwiZGVzdGluYXRpb24iOiJzMzovL2J1Y2tldC9iYWNrdXAiLCJyZXF1ZXN0ZWRfYnkiOiJhZG1pbiJ9"
+Producer: 2025/06/25 22:19:26 producer.go:50: ✅ Enqueued task: ID=task-20250625221926 | Type=image_resize | Payload="eyJpbWFnZV91cmwiOiJodHRwOi8vaW1nLmNvbS8xLmpwZyIsIndpZHRoIjo4MDAsImhlaWdodCI6NjAwfQ=="
+Producer: 2025/06/25 22:19:31 producer.go:50: ✅ Enqueued task: ID=task-20250625221931 | Type=image_resize | Payload="eyJpbWFnZV91cmwiOiJodHRwOi8vaW1nLmNvbS8xLmpwZyIsIndpZHRoIjo4MDAsImhlaWdodCI6NjAwfQ=="
+Producer: 2025/06/25 22:19:36 producer.go:50: ✅ Enqueued task: ID=task-20250625221936 | Type=notification | Payload="eyJ1c2VyX2lkIjoidXNlcjEyMyIsIm1lc3NhZ2UiOiJQaW5nISIsImNoYW5uZWwiOiJwdXNoIiwidGltZXN0YW1wIjoxNzUwODcwMTc2fQ=="
+Producer: 2025/06/25 22:19:41 producer.go:50: ✅ Enqueued task: ID=task-20250625221941 | Type=email | Payload="eyJ0byI6ImFAZXhhbXBsZS5jb20iLCJzdWJqZWN0IjoiSGVsbG8iLCJib2R5IjoiQm9keSB0ZXh0In0="
+Producer: 2025/06/25 22:19:46 producer.go:50: ✅ Enqueued task: ID=task-20250625221946 | Type=email | Payload="eyJ0byI6ImFAZXhhbXBsZS5jb20iLCJzdWJqZWN0IjoiSGVsbG8iLCJib2R5IjoiQm9keSB0ZXh0In0="
+Producer: 2025/06/25 22:19:51 producer.go:32: ❌ Producer stopped
+Producer: 2025/06/25 22:19:51 producer.go:33: ===========================================
