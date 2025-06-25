@@ -44,7 +44,7 @@ func (rq *RedisQueue) Dequeue(timeout time.Duration) (*models.Task, error) {
 	result, err := rq.redisClient.BLPop(rq.ctx, timeout, RedisTaskQueueKey).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			return nil, nil
+			return nil, errors.New("redis nil")
 		}
 		return nil, err
 	}

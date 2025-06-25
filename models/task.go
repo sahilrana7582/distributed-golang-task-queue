@@ -36,7 +36,7 @@ func NewTask(id, taskType string, payload any) (*Task, error) {
 	t := &Task{
 		ID:         id,
 		Type:       taskType,
-		Payload:    data,
+		Payload:    json.RawMessage(data),
 		Status:     StatusPending,
 		Attempts:   0,
 		MaxRetries: 3,

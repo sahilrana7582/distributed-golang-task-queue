@@ -2,7 +2,6 @@ package producer
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"math/rand"
 	"os"
@@ -55,23 +54,23 @@ func ProducePayload(redisQueue *queue.RedisQueue, ctx context.Context) {
 	}()
 }
 
-func randomPayload() (string, []byte) {
+func randomPayload() (string, any) {
 	switch rand.Intn(4) {
 	case 0:
-		p := payloads.EmailPayload{To: "a@example.com", Subject: "Hello", Body: "Body text"}
-		b, _ := json.Marshal(p)
-		return "email", b
+		return "email", payloads.EmailPayload{
+			To: "a@example.com", Subject: "Hello", Body: "Body text",
+		}
 	case 1:
-		p := payloads.ImageResizePayload{ImageURL: "http://img.com/1.jpg", Width: 800, Height: 600}
-		b, _ := json.Marshal(p)
-		return "image_resize", b
+		return "image_resize", payloads.ImageResizePayload{
+			ImageURL: "http://img.com/1.jpg", Width: 800, Height: 600,
+		}
 	case 2:
-		p := payloads.NotificationPayload{UserID: "user123", Message: "Ping!", Channel: "push", Timestamp: time.Now().Unix()}
-		b, _ := json.Marshal(p)
-		return "notification", b
+		return "notification", payloads.NotificationPayload{
+			UserID: "user123", Message: "Ping!", Channel: "push", Timestamp: time.Now().Unix(),
+		}
 	default:
-		p := payloads.DataBackupPayload{ResourceID: "res01", BackupType: "full", Destination: "s3://bucket/backup", RequestedBy: "admin"}
-		b, _ := json.Marshal(p)
-		return "data_backup", b
+		return "data_backup", payloads.DataBackupPayload{
+			ResourceID: "res01", BackupType: "full", Destination: "s3://bucket/backup", RequestedBy: "admin",
+		}
 	}
 }

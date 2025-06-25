@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/sahilrana27582/go-task-queue/cmd/consumer"
 	"github.com/sahilrana27582/go-task-queue/cmd/producer"
 	"github.com/sahilrana27582/go-task-queue/internal/queue"
 )
@@ -32,6 +33,7 @@ func main() {
 	}()
 
 	go producer.ProducePayload(redisQueue, ctx)
+	go consumer.StartWorker(redisQueue, ctx)
 
 	log.Println("🚀 All services started. Waiting for shutdown signal...")
 
