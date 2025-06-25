@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 	"time"
 
 	handlers "github.com/sahilrana27582/go-task-queue/handles"
@@ -13,47 +14,57 @@ import (
 	"github.com/sahilrana27582/go-task-queue/models/payloads"
 )
 
-func StartWorker(redisQueue *queue.RedisQueue, ctx context.Context) {
+func StartWorker(redisQueue *queue.RedisQueue, ctx context.Context, numWorkers int) {
 	file, err := os.OpenFile("./cmd/consumer/consumer.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("Failed to open consumer log file: %v", err)
 	}
 	logger := log.New(file, "Consumer: ", log.LstdFlags|log.Lshortfile)
 
-	go func() {
-		logger.Printf("====================     %s    =======================", time.Now().Format("2006-01-02 15:04:05"))
-		logger.Println("🚀 Consumer started, waiting for tasks...")
-		defer file.Close()
-		for {
-			select {
-			case <-ctx.Done():
-				logger.Println("❌ Consumer stopped")
-				logger.Println("===========================================")
-				return
-			default:
-				task, err := redisQueue.Dequeue(1 * time.Second)
-				if err != nil {
-					if err.Error() == "redis nil" {
-						logger.Println("🔄 No tasks in queue, retrying...")
-						time.Sleep(1 * time.Second)
+	logger.Printf("🚀 Starting %d workers at %s", numWorkers, time.Now().Format("2006-01-02 15:04:05"))
+
+	defer file.Close()
+	wg := sync.WaitGroup{}
+	wg.Add(numWorkers)
+	for i := 0; i < numWorkers; i++ {
+		go func(workerID int) {
+			defer wg.Done()
+			logger.Printf("🧵 Worker-%d started", workerID)
+			defer func() {
+				if r := recover(); r != nil {
+					logger.Printf("❌ Worker-%d encountered an error: %v", workerID, r)
+				}
+				wg.Done()
+			}()
+
+			for {
+				select {
+				case <-ctx.Done():
+					logger.Printf("❌ Worker-%d stopped", workerID)
+					return
+				default:
+					task, err := redisQueue.Dequeue(2 * time.Second)
+					if err != nil {
+						if err.Error() == "redis nil" {
+							logger.Printf("🔄 Worker-%d: No task, retrying...", workerID)
+							continue
+						}
+						logger.Printf("❌ Worker-%d: Failed to dequeue: %v", workerID, err)
 						continue
 					}
-					logger.Printf("❌ Failed to dequeue task: %v", err)
-					time.Sleep(1 * time.Second)
-					continue
-				}
 
-				logger.Printf("⏳ Processing task ID=%s, Type=%s, Payload=%s", task.ID, task.Type, task.Payload)
-				fmt.Println("⏳ Processing task ID=", task.ID, "Type=", task.Type, "Payload=", string(task.Payload))
-
-				if err := dispatch(task.Type, task.Payload); err != nil {
-					logger.Printf("❌ Error handling task %s: %v", task.ID, err)
-				} else {
-					logger.Printf("✅ Task %s completed successfully", task.ID)
+					logger.Printf("⏳ Worker-%d: Task ID=%s, Type=%s", workerID, task.ID, task.Type)
+					if err := dispatch(task.Type, task.Payload); err != nil {
+						logger.Printf("❌ Worker-%d: Failed to handle task %s: %v", workerID, task.ID, err)
+					} else {
+						logger.Printf("✅ Worker-%d: Task %s done", workerID, task.ID)
+					}
 				}
 			}
-		}
-	}()
+		}(i + 1)
+	}
+
+	wg.Wait()
 }
 
 func dispatch(taskType string, rawPayload []byte) error {

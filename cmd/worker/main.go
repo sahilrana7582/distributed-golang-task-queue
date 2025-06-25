@@ -17,6 +17,8 @@ import (
 func main() {
 	redisQueue := queue.NewRedisQueue("localhost:6379")
 	ctx, cancel := context.WithCancel(context.Background())
+
+	const consumerCount = 5
 	defer cancel()
 
 	done := make(chan struct{})
@@ -32,8 +34,8 @@ func main() {
 		close(done)
 	}()
 
-	go producer.ProducePayload(redisQueue, ctx)
-	go consumer.StartWorker(redisQueue, ctx)
+	go producer.ProducePayload(redisQueue, ctx, 10)
+	go consumer.StartWorker(redisQueue, ctx, 100)
 
 	log.Println("🚀 All services started. Waiting for shutdown signal...")
 
